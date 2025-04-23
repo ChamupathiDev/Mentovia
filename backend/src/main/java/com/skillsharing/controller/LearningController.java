@@ -172,7 +172,12 @@ public class LearningController {
         }
     }
     
-    
+    // Get learning updates for a user
+    @GetMapping("/updates/user/{userId}")
+    public ResponseEntity<List<LearningUpdate>> getUserLearningUpdates(@PathVariable String userId) {
+        List<LearningUpdate> updates = learningUpdateRepository.findByUserIdOrderByCompletedAtDesc(userId);
+        return ResponseEntity.ok(updates);
+    }
     
     // Delete a learning update
     @DeleteMapping("/updates/{updateId}")
