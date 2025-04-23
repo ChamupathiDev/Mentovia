@@ -90,8 +90,26 @@ public class LearningController {
     }
     
     // Add a learning update
-
-   
+    
+    @PostMapping("/updates")
+    public ResponseEntity<?> addLearningUpdate(@RequestBody LearningUpdate learningUpdate) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        learningUpdate.setUserId(currentUser.getId());
+        learningUpdate.setCreatedAt(LocalDateTime.now());
+        
+        if (learningUpdate.getCompletedAt() == null) {
+            learningUpdate.setCompletedAt(LocalDateTime.now());
+        }
+        
+        // Initialize skills if null
+        if (currentUser.getSkills() == null) {
+            currentUser.setSkills(new HashSet<>());
+        }
         
         // Update user's skills with newly learned skills
         if (learningUpdate.getSkillsLearned() != null && !learningUpdate.getSkillsLearned().isEmpty()) {
