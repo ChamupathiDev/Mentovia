@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/learning")
 @RequiredArgsConstructor
 public class LearningController {
+  
     
     private static final Logger logger = LoggerFactory.getLogger(LearningController.class);
     private final LearningUpdateRepository learningUpdateRepository;
