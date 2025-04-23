@@ -39,3 +39,4 @@ public interface UserRepository extends MongoRepository<User, String> {
            "{ 'skills': { $regex: ?0, $options: 'i' } } ] }")
     List<User> findByNameOrSkillsRegex(String regex);
 }
+
