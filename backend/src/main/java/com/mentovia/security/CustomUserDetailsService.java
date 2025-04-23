@@ -30,3 +30,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getEmail(), user.getPassword(), auth);
     }
 }
+
