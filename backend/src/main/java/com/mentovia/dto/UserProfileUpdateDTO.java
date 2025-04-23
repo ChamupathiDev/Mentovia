@@ -22,3 +22,4 @@ public class UserProfileUpdateDTO {
     private String newPassword;
     private String profilePicture;
 }
+
