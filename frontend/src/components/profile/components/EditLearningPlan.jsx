@@ -642,13 +642,14 @@ const EditLearningPlan = () => {
                   Update Learning Plan
                 </>
               )}
+              
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-  
+
 };
 
 export default EditLearningPlan;
