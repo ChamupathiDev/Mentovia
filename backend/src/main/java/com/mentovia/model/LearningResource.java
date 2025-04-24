@@ -16,3 +16,4 @@ public class LearningResource {
     private long createdAt;
     private long updatedAt;
 }
+
