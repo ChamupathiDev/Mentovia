@@ -4,6 +4,7 @@ import Navbar from '../../common/Navbar';
 import { useToast } from '../../common/Toast';
 import { API_BASE_URL } from '../../../config/apiConfig';
 
+
 const CreateLearningPlan = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
