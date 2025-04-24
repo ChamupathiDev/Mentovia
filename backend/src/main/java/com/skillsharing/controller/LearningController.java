@@ -179,7 +179,35 @@ public class LearningController {
         return ResponseEntity.ok(updates);
     }
     
- 
+    // Delete a learning update
+    @DeleteMapping("/updates/{updateId}")
+    public ResponseEntity<?> deleteLearningUpdate(@PathVariable String updateId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        Optional<LearningUpdate> updateOpt = learningUpdateRepository.findById(updateId);
+        
+        if (updateOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        LearningUpdate update = updateOpt.get();
+        
+        // Only allow the owner to delete their updates
+        if (!update.getUserId().equals(currentUser.getId())) {
+            return ResponseEntity.status(403).body("You are not authorized to delete this learning update");
+        }
+        
+        learningUpdateRepository.delete(update);
+        
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Learning update deleted successfully");
+        
+        return ResponseEntity.ok(response);
+    }
     
     // Update a learning update
     @PutMapping("/updates/{updateId}")
