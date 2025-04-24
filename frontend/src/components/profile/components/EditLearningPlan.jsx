@@ -648,6 +648,7 @@ const EditLearningPlan = () => {
       </div>
     </div>
   );
+  
 };
 
 export default EditLearningPlan;
