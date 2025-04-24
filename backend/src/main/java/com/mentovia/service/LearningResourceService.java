@@ -35,3 +35,5 @@ public class LearningResourceService {
     }
     public List<LearningResource> getAll() { return repo.findAll(); }
 }
+
+
