@@ -16,3 +16,5 @@ public class LearningResourceCreateDTO {
 
     private String mediaLink;
 }
+
+
