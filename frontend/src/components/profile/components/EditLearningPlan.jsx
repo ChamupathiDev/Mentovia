@@ -12,6 +12,7 @@ const EditLearningPlan = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    
     title: '',
     description: '',
     resources: [],
@@ -642,7 +643,7 @@ const EditLearningPlan = () => {
                   Update Learning Plan
                 </>
               )}
-              
+
             </button>
           </div>
         </form>
