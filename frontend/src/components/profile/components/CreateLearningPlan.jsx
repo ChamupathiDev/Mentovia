@@ -60,7 +60,96 @@ const CreateLearningPlan = () => {
     fetchCurrentUser();
   }, [navigate, addToast]);
 
-  
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Title validation
+    if (!formData.title.trim()) {
+      newErrors.title = 'Title is required';
+    } else if (formData.title.length < 3) {
+      newErrors.title = 'Title must be at least 3 characters long';
+    } else if (formData.title.length > 255) {
+      newErrors.title = 'Title cannot exceed 255 characters';
+    }
+
+    // Description validation (optional, but if provided, must meet criteria)
+    if (formData.description) {
+      if (formData.description.length < 10) {
+        newErrors.description = 'Description must be at least 10 characters long if provided';
+      } else if (formData.description.length > 1000) {
+        newErrors.description = 'Description cannot exceed 1000 characters';
+      }
+    }
+
+
+    // Resources validation
+    if (formData.resources.length === 0) {
+      newErrors.resources = 'At least one resource is required';
+    } else {
+      formData.resources.forEach((resource, index) => {
+        // Resource Title
+        if (!resource.title.trim()) {
+          newErrors[`resourceTitle${index}`] = 'Resource title is required';
+        } else if (resource.title.length < 3) {
+          newErrors[`resourceTitle${index}`] = 'Resource title must be at least 3 characters long';
+        } else if (resource.title.length > 100) {
+          newErrors[`resourceTitle${index}`] = 'Resource title cannot exceed 100 characters';
+        }
+
+        // Resource URL
+        if (!resource.url.trim()) {
+          newErrors[`resourceUrl${index}`] = 'Resource URL is required';
+        } else if (!/^https?:\/\/[^\s$.?#].[^\s]*$/.test(resource.url)) {
+          newErrors[`resourceUrl${index}`] = 'Invalid URL format (must start with http:// or https://)';
+        } else if (resource.url.length > 2048) {
+          newErrors[`resourceUrl${index}`] = 'URL cannot exceed 2048 characters';
+        }
+
+        // Resource Type
+        if (!resource.type) {
+          newErrors[`resourceType${index}`] = 'Resource type is required';
+        } else if (!resourceTypes.includes(resource.type)) {
+          newErrors[`resourceType${index}`] = 'Invalid resource type';
+        }
+      });
+    }
+
+    // Weeks validation
+    if (formData.weeks.length === 0) {
+      newErrors.weeks = 'At least one week is required';
+    } else {
+      formData.weeks.forEach((week, index) => {
+        // Week Title
+        if (!week.title.trim()) {
+          newErrors[`weekTitle${index}`] = 'Week title is required';
+        } else if (week.title.length < 3) {
+          newErrors[`weekTitle${index}`] = 'Week title must be at least 3 characters long';
+        } else if (week.title.length > 100) {
+          newErrors[`weekTitle${index}`] = 'Week title cannot exceed 100 characters';
+        }
+
+        // Week Description (optional, but if provided, must meet criteria)
+        if (week.description) {
+          if (week.description.length < 10) {
+            newErrors[`weekDescription${index}`] = 'Week description must be at least 10 characters long if provided';
+          } else if (week.description.length > 500) {
+            newErrors[`weekDescription${index}`] = 'Week description cannot exceed 500 characters';
+          }
+        }
+
+        // Week Status
+        if (!week.status) {
+          newErrors[`weekStatus${index}`] = 'Week status is required';
+        } else if (!['Not Started', 'In Progress', 'Completed'].includes(week.status)) {
+          newErrors[`weekStatus${index}`] = 'Invalid week status';
+        }
+      });
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleInputChange = (e, section, index, field) => {
     const { value } = e.target;
     const fieldKey = section ? `${section}${field}${index}` : e.target.name;
