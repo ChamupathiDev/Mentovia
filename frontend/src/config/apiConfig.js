@@ -26,3 +26,4 @@ export const RESOURCES = {
   UPDATE:  (id) => `${API_BASE_URL}/resources/${id}`,
   DELETE:  (id) => `${API_BASE_URL}/resources/${id}`
 };
+
