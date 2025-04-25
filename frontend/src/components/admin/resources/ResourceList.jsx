@@ -130,7 +130,7 @@ export default function ResourceList() {
           </tbody>
         </table>
       </div>
-
+      
       {list.length === 0 && (
         <div className="text-center py-12 text-gray-500 transition-opacity duration-300 ease-in-out">
           No resources found. Create your first resource!
