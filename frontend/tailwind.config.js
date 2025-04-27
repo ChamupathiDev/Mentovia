@@ -28,10 +28,10 @@ module.exports = {
         '1200': '1200ms',
       },
       colors: {
-        PrimaryColor: "#f8fafc",     // Light background
-        SecondaryColor: "#94a3b8",   // Medium tone for secondary elements
-        DarkColor: "#334155",        // Dark blue-gray for primary elements
-        ExtraDarkColor: "#0f172a",   // Deep blue-black for emphasis and headers
+        PrimaryColor: '#3B82F6',    // Blue-500
+        SecondaryColor: '#60A5FA',  // Blue-400
+        DarkColor: '#1E40AF',       // Blue-800
+        ExtraDarkColor: '#1E3A8A',  // Blue-900
       },
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
