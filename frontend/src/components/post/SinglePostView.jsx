@@ -99,7 +99,7 @@ const SinglePostView = () => {
     return date.toLocaleDateString();
   };
 
-  // Handle like post
+  // Handle like post 
   const handleLikePost = async () => {
     if (!post) return;
     
