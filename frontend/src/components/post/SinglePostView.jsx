@@ -113,7 +113,8 @@ const SinglePostView = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to like post');
+        throw new Error
+        ('Failed to like post');
       }
 
       const data = await response.json();
