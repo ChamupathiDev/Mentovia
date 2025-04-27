@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../config/apiConfig';
 import Navbar from '../common/Navbar';
-import DefaultAvatar from '../../assets/avatar.png';
+import DefaultAvatar from '../../assets/pp2.jpeg';
 import { storage } from '../../config/firebaseConfig';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useToast } from '../common/Toast';

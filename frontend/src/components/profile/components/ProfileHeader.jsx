@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import DefaultCover from '../../../assets/p.png';
-import DefaultAvatar from '../../../assets/avatar.png';
+import DefaultCover from '../../../assets/lms3.jpeg';
+import DefaultAvatar from '../../../assets/pp2.jpeg';
 
 const ProfileHeader = ({ 
   user, 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../config/apiConfig';
-import DefaultAvatar from '../../assets/avatar.png';
+import DefaultAvatar from '../../assets/pp2.jpeg';
 import Navbar from '../common/Navbar';
 import CommentSection from '../common/CommentSection';
 import { useToast } from '../common/Toast';

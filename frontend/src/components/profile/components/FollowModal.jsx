@@ -1,5 +1,5 @@
 import React from 'react';
-import DefaultAvatar from '../../../assets/avatar.png';
+import DefaultAvatar from '../../../assets/pp2.jpeg';
 
 const FollowModal = ({
   isOpen,

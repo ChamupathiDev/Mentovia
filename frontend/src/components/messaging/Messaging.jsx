@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'boxicons/css/boxicons.min.css';
 import { API_BASE_URL } from '../../config/apiConfig';
-import DefaultAvatar from '../../assets/avatar.png';
+import DefaultAvatar from '../../assets/pp2.jpeg';
 import Navbar from '../common/Navbar';
 import { useToast } from '../common/Toast';
 

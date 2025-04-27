@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../config/apiConfig';
-import DefaultAvatar from '../../assets/avatar.png';
+import DefaultAvatar from '../../assets/pp2.jpeg';
 import { useToast } from './Toast';
 
 const SharePostModal = ({ isOpen, onClose, post, currentUser }) => {

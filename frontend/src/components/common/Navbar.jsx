@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "boxicons/css/boxicons.min.css";
-import DefaultAvatar from "../../assets/avatar.png";
+import DefaultAvatar from "../../assets/pp2.jpeg";
 import { API_BASE_URL } from "../../config/apiConfig";
 import { useToast } from "../common/Toast";
 import { useAuth } from "../../hooks/useAuth";

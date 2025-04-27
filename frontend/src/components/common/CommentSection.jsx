@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../config/apiConfig';
-import DefaultAvatar from '../../assets/avatar.png';
+import DefaultAvatar from '../../assets/pp2.jpeg';
 import { useToast } from './Toast';
 import ConfirmDialog from './ConfirmDialog';
 

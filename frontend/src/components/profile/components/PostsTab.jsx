@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DefaultAvatar from '../../../assets/avatar.png';
+import DefaultAvatar from '../../../assets/pp2.jpeg';
 import { API_BASE_URL } from '../../../config/apiConfig';
 import SharePostModal from '../../common/SharePostModal';
 import CommentSection from '../../common/CommentSection';
