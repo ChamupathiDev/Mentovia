@@ -426,6 +426,8 @@ const Profile = () => {
     }
   };
 
+ 
+
   const handlePostMediaChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -596,6 +598,7 @@ const Profile = () => {
                   <i className='bx bx-message-square-detail mr-2 text-lg'></i>
                   Posts
                 </button>
+  
                 <button
                   onClick={() => setActiveTab('learning')}
                   className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'learning'
