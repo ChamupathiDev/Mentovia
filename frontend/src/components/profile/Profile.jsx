@@ -16,6 +16,7 @@ import AchievementsTab from './components/AchievementsTab';
 import FollowModal from './components/FollowModal';
 import PostCreationModal from './components/PostCreationModal';
 import SharePostModal from '../common/SharePostModal';
+import ResourceHub from '../resourcehub/ResourceHub';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -610,6 +611,15 @@ const Profile = () => {
                   Learning
                 </button>
                 <button
+    onClick={() => setActiveTab('resources')}
+    className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'resources'
+      ? 'border-DarkColor text-DarkColor'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+  >
+    <i className='bx bx-link mr-2 text-lg'></i>
+    Resources
+  </button>
+                <button
                   onClick={() => setActiveTab('achievements')}
                   className={`py-4 px-6 text-center border-b-2 font-medium text-sm flex items-center ${activeTab === 'achievements'
                       ? 'border-DarkColor text-DarkColor'
@@ -642,6 +652,8 @@ const Profile = () => {
               )}
 
               {activeTab === 'learning' && <LearningTab />}
+
+              {activeTab === 'resources' && <ResourceHub />}
 
               {activeTab === 'achievements' && <AchievementsTab />}
             </div>

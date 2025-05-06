@@ -17,6 +17,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import ResourceList from './components/admin/resources/ResourceList';
 import ResourceForm from './components/admin/resources/ResourceForm';
 import ResourceEdit from './components/admin/resources/ResourceEdit';
+import ResourceHub from './components/resourcehub/ResourceHub';
 
 function App() {
   return (
@@ -37,6 +38,8 @@ function App() {
           <Route path="/learning-plans/edit/:id" element={<EditLearningPlan />} /> 
           <Route path="/learning-plans" element={<ViewAllLearningPlans />} />
           <Route path="/learning-plans/followed" element={<OtherLearningPlans />} />
+          <Route path="/resources/hub" element={<ResourceHub />} />
+
           
 
           {/* Admin protected */}
