@@ -24,6 +24,7 @@ export const RESOURCES = {
   LIST:    `${API_BASE_URL}/resources`,
   UPLOAD:  `${API_BASE_URL}/resources/upload`,
   UPDATE:  (id) => `${API_BASE_URL}/resources/${id}`,
-  DELETE:  (id) => `${API_BASE_URL}/resources/${id}`
+  DELETE:  (id) => `${API_BASE_URL}/resources/${id}`,
+  UPDATE_UPLOAD: (id) => `${API_BASE_URL}/resources/${id}/upload`,
 };
 

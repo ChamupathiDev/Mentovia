@@ -34,7 +34,7 @@ export default function ResourceEdit() {
     formData.append("type", data.type);
     if(file) formData.append("file", file);
 
-    fetch(RESOURCES.UPDATE(id), {
+    fetch(RESOURCES.UPDATE_UPLOAD(id), {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`

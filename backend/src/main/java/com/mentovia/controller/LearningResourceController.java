@@ -1,7 +1,5 @@
-// src/main/java/com/mentovia/controller/LearningResourceController.java
 package com.mentovia.controller;
 
-import com.mentovia.dto.LearningResourceCreateDTO;
 import com.mentovia.dto.LearningResourceDTO;
 import com.mentovia.model.LearningResource;
 import com.mentovia.service.FileStorageService;
@@ -16,18 +14,22 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/resources")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 @Validated
 public class LearningResourceController {
     private final LearningResourceService service;
     private final FileStorageService fileStorage;
 
+    /**
+     * List all resources
+     */
     @GetMapping
     public List<LearningResourceDTO> list() {
         return service.getAll().stream()
@@ -35,20 +37,38 @@ public class LearningResourceController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get by ID
+     */
     @GetMapping("/{id}")
     public LearningResourceDTO get(@PathVariable String id) {
         return toDTO(service.getById(id));
     }
 
+    /**
+     * Create via JSON
+     */
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(value = "/upload", consumes = {"multipart/form-data"})
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LearningResourceDTO> createJson(
+            @RequestBody @Valid LearningResourceDTO dto
+    ) {
+        LearningResource r = dto.toEntity();
+        LearningResource saved = service.create(r);
+        return ResponseEntity.ok(toDTO(saved));
+    }
+
+    /**
+     * Create with file upload
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LearningResourceDTO> createWithUpload(
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam String type,
             @RequestParam MultipartFile file
     ) {
-        // storeFile returns the stored filename
         String filename = fileStorage.storeFile(file, type);
         LearningResource r = new LearningResource();
         r.setTitle(title);
@@ -59,38 +79,40 @@ public class LearningResourceController {
         return ResponseEntity.ok(toDTO(saved));
     }
 
-
-    @GetMapping("/file/{filename:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-        Resource file = fileStorage.loadAsResource(filename);
-        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
-                .header(HttpHeaders.CONTENT_TYPE, contentType)
-                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173")
-                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET")
-                .body(file);
+    /**
+     * Update via JSON
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LearningResourceDTO> updateJson(
+            @PathVariable String id,
+            @RequestBody @Valid LearningResourceDTO dto
+    ) {
+        LearningResource existing = service.getById(id);
+        existing.updateFromDto(dto);
+        LearningResource updated = service.update(id, existing);
+        return ResponseEntity.ok(toDTO(updated));
     }
 
-    // Update the existing PUT endpoint
+    /**
+     * Update with file upload
+     */
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping(value = "/{id}", consumes = {"multipart/form-data"})
-    public ResponseEntity<LearningResourceDTO> update(
+    @PutMapping(value = "/{id}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<LearningResourceDTO> updateWithUpload(
             @PathVariable String id,
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam String type,
-            @RequestParam(required = false) MultipartFile file) {
-
+            @RequestParam(required = false) MultipartFile file
+    ) {
         LearningResource existing = service.getById(id);
         existing.setTitle(title);
         existing.setDescription(description);
         existing.setType(type);
 
         if (file != null && !file.isEmpty()) {
-            // Remove old file
             fileStorage.deleteFile(existing.getMediaLink(), existing.getType());
-            // Store new file
             String filename = fileStorage.storeFile(file, type);
             existing.setMediaLink(filename);
         }
@@ -99,35 +121,40 @@ public class LearningResourceController {
         return ResponseEntity.ok(toDTO(updated));
     }
 
-// Remove the old PUT mapping that uses @RequestBody
-
+    /**
+     * Delete by ID
+     */
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Mapping helpers
+    /**
+     * Preview endpoint: inline display of PDFs and videos
+     */
+    @GetMapping("/file/{filename:.+}")
+    public ResponseEntity<Resource> previewFile(@PathVariable String filename) {
+        Resource file = fileStorage.loadAsResource(filename);
+        String contentType = fileStorage.detectContentType(filename);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(file);
+    }
+
+    // --- Mapping helpers ---
     private LearningResourceDTO toDTO(LearningResource r) {
         LearningResourceDTO dto = new LearningResourceDTO();
         dto.setId(r.getId());
         dto.setTitle(r.getTitle());
         dto.setDescription(r.getDescription());
         dto.setType(r.getType());
-        dto.setMediaLink(r.getMediaLink());  // filename only
+        dto.setMediaLink(r.getMediaLink());
         dto.setCreatedAt(r.getCreatedAt());
         dto.setUpdatedAt(r.getUpdatedAt());
         return dto;
     }
-
-    private LearningResource fromCreateDTO(LearningResourceCreateDTO dto) {
-        LearningResource r = new LearningResource();
-        r.setTitle(dto.getTitle());
-        r.setDescription(dto.getDescription());
-        r.setType(dto.getType());
-        r.setMediaLink(dto.getMediaLink());
-        return r;
-    }
 }
-
