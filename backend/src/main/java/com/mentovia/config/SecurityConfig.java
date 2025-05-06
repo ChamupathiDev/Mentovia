@@ -77,11 +77,18 @@ public WebSecurityCustomizer webSecurityCustomizer() {
                 // all other resource reads require authentication
                 .requestMatchers(HttpMethod.GET,    "/resources").authenticated()
                 .requestMatchers(HttpMethod.GET,    "/resources/*").authenticated()
+                .requestMatchers("/users/**").authenticated()
+                .requestMatchers("/posts/**").authenticated() // Add explicit permission for posts endpoints
+                .requestMatchers("/messages/**").authenticated() 
+                .requestMatchers("/learning-plan/**").permitAll()              // Also add permission for messages endpoints
 
                 // resource writes require ADMIN
                 .requestMatchers(HttpMethod.POST,   "/resources").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,    "/resources/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/resources/**").hasRole("ADMIN")
+
+
+                
 
                 // everything else authenticated
                 .anyRequest().authenticated()

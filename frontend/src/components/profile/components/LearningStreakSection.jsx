@@ -40,6 +40,7 @@ const LearningStreakSection = ({ user, refreshTrigger }) => {
     }
   };
 
+
   if (isLoading) {
     return (
       <div className="bg-white shadow-md rounded-lg p-6 mt-4">
