@@ -8,6 +8,9 @@ export default function ResourceHub() {
   const [searchText, setSearchText] = useState("");
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const pageSize = 3; // Number of cards per page
 
   // Fetch resources once
   useEffect(() => {
@@ -40,6 +43,7 @@ export default function ResourceHub() {
       list = list.filter(r => r.title.toLowerCase().includes(lower));
     }
     setFiltered(list);
+    setCurrentPage(1); // Reset to first page on filter change
   }, [resources, searchText, typeFilter]);
 
   if (error) {
@@ -49,6 +53,10 @@ export default function ResourceHub() {
       </div>
     );
   }
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const startIdx = (currentPage - 1) * pageSize;
+  const currentResources = filtered.slice(startIdx, startIdx + pageSize);
 
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-white">
@@ -74,9 +82,9 @@ export default function ResourceHub() {
         </select>
       </div>
 
-      {/* Single-column Resource cards */}
+      {/* Paginated Resource cards */}
       <div className="grid grid-cols-1 gap-6">
-        {filtered.map(r => (
+        {currentResources.map(r => (
           <div
             key={r.id}
             className="bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-700 h-48 flex flex-col justify-between w-full"
@@ -116,6 +124,37 @@ export default function ResourceHub() {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6 space-x-2">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+          >
+            Prev
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 rounded-lg ${
+                page === currentPage ? 'bg-indigo-500' : 'bg-gray-700 hover:bg-gray-600'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
