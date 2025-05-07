@@ -1,11 +1,14 @@
 package com.mentovia.model;
 
-import lombok.Data;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.HashSet;
-import java.util.Set;
+
+import lombok.Data;
 
 @Data
 @Document(collection = "users")
@@ -31,6 +34,12 @@ public class User {
     private Set<String> following = new HashSet<>();
     private boolean enabled = true;
     
+    // Learning streak fields
+    private int currentStreak = 0;
+    private int longestStreak = 0;
+    private LocalDate lastLearningDate;
+    private Set<LocalDate> learningDates = new HashSet<>();
+    
     // Helper method to get full name
     public String getFullName() {
         if (firstName != null && lastName != null) {
@@ -44,7 +53,3 @@ public class User {
         }
     }
 }
-
-
-
-
