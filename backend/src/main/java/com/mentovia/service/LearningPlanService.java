@@ -33,12 +33,13 @@ public class LearningPlanService {
         learningPlan.setDescription(learningPlanDTO.getDescription());
         learningPlan.setResources(
             learningPlanDTO.getResources().stream()
-                .map(resourceDTO -> {
-                    Resource resource = new Resource();
-                    resource.setTitle(resourceDTO.getTitle());
-                    resource.setUrl(resourceDTO.getUrl());
-                    return resource;
-                })
+            .map(resourceDTO -> {
+                Resource resource = new Resource();
+                resource.setTitle(resourceDTO.getTitle());
+                resource.setUrl(resourceDTO.getUrl());
+                resource.setType(resourceDTO.getType()); // Add this line
+                return resource;
+            })
                 .toList()
         );
         learningPlan.setWeeks(
@@ -56,41 +57,39 @@ public class LearningPlanService {
 
     public LearningPlan updateLearningPlan(String id, LearningPlanDTO learningPlanDTO) {
         return learningPlanRepository.findById(id)
-                .map(existingPlan -> {
-                    existingPlan.setResources(
-                        learningPlanDTO.getResources().stream()
-                            .map(resourceDTO -> {
-                                Resource resource = new Resource();
-                                resource.setTitle(resourceDTO.getTitle());
-                                resource.setUrl(resourceDTO.getUrl());
-                                return resource;
-                            })
-                            .toList()
-                    );
-                    existingPlan.setDescription(learningPlanDTO.getDescription());
-                    existingPlan.setResources(
-                        learningPlanDTO.getResources().stream()
-                            .map(resourceDTO -> {
-                                Resource resource = new Resource();
-                                resource.setTitle(resourceDTO.getTitle());
-                                resource.setUrl(resourceDTO.getUrl());
-                                return resource;
-                            })
-                            .toList()
-                    );
-                    existingPlan.setWeeks(
-                        learningPlanDTO.getWeeks().stream()
-                            .map(weekDTO -> {
-                                Week week = new Week();
-                                week.setTitle(weekDTO.getTitle());
-                                week.setDescription(weekDTO.getDescription());
-                                return week;
-                            })
-                            .toList()
-                    );
-                    return learningPlanRepository.save(existingPlan);
-                })
-                .orElseThrow(() -> new RuntimeException("LearningPlan not found with id: " + id));
+            .map(existingPlan -> {
+                existingPlan.setTitle(learningPlanDTO.getTitle());
+                existingPlan.setDescription(learningPlanDTO.getDescription());
+    
+                // Map Resources
+                existingPlan.setResources(
+                    learningPlanDTO.getResources().stream()
+                        .map(resourceDTO -> {
+                            Resource resource = new Resource();
+                            resource.setTitle(resourceDTO.getTitle());
+                            resource.setUrl(resourceDTO.getUrl());
+                            resource.setType(resourceDTO.getType()); // ✅
+                            return resource;
+                        })
+                        .toList()
+                );
+    
+                // Map Weeks (WITH STATUS)
+                existingPlan.setWeeks(
+                    learningPlanDTO.getWeeks().stream()
+                        .map(weekDTO -> {
+                            Week week = new Week();
+                            week.setTitle(weekDTO.getTitle());
+                            week.setDescription(weekDTO.getDescription());
+                            week.setStatus(weekDTO.getStatus()); // ✅
+                            return week;
+                        })
+                        .toList()
+                );
+    
+                return learningPlanRepository.save(existingPlan);
+            })
+            .orElseThrow(() -> new RuntimeException("LearningPlan not found"));
     }
 
     public void deleteLearningPlan(String id) {
