@@ -14,13 +14,11 @@ const EditLearningPlan = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    resources: [],
     weeks: [],
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
-  const resourceTypes = ['Video', 'Documentation', 'Article', 'Tutorial', 'Book'];
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -66,12 +64,10 @@ const EditLearningPlan = () => {
         setFormData({
           title: data.title || '',
           description: data.description || '',
-          resources: data.resources && Array.isArray(data.resources) && data.resources.length > 0
-            ? data.resources
-            : [{ title: '', url: '', type: 'Video' }],
+          
           weeks: data.weeks && Array.isArray(data.weeks) && data.weeks.length > 0
             ? data.weeks
-            : [{ title: '', description: '', status: 'Not Started' }],
+            : [{ title: '', description: '', status: 'Not Completed' }],
         });
       } catch (error) {
         console.error('Error fetching learning plan:', error);
@@ -104,37 +100,7 @@ const EditLearningPlan = () => {
       }
     }
 
-    // Resources validation
-    if (formData.resources.length === 0) {
-      newErrors.resources = 'At least one resource is required';
-    } else {
-      formData.resources.forEach((resource, index) => {
-        // Resource Title
-        if (!resource.title.trim()) {
-          newErrors[`resourceTitle${index}`] = 'Resource title is required';
-        } else if (resource.title.length < 3) {
-          newErrors[`resourceTitle${index}`] = 'Resource title must be at least 3 characters long';
-        } else if (resource.title.length > 100) {
-          newErrors[`resourceTitle${index}`] = 'Resource title cannot exceed 100 characters';
-        }
-
-        // Resource URL
-        if (!resource.url.trim()) {
-          newErrors[`resourceUrl${index}`] = 'Resource URL is required';
-        } else if (!/^https?:\/\/[^\s$.?#].[^\s]*$/.test(resource.url)) {
-          newErrors[`resourceUrl${index}`] = 'Invalid URL format (must start with http:// or https://)';
-        } else if (resource.url.length > 2048) {
-          newErrors[`resourceUrl${index}`] = 'URL cannot exceed 2048 characters';
-        }
-
-        // Resource Type
-        if (!resource.type) {
-          newErrors[`resourceType${index}`] = 'Resource type is required';
-        } else if (!resourceTypes.includes(resource.type)) {
-          newErrors[`resourceType${index}`] = 'Invalid resource type';
-        }
-      });
-    }
+    
 
     // Weeks validation
     if (formData.weeks.length === 0) {
@@ -162,7 +128,7 @@ const EditLearningPlan = () => {
         // Week Status
         if (!week.status) {
           newErrors[`weekStatus${index}`] = 'Week status is required';
-        } else if (!['Not Started', 'In Progress', 'Completed'].includes(week.status)) {
+        } else if (!['Not Completed', 'Completed'].includes(week.status)) {
           newErrors[`weekStatus${index}`] = 'Invalid week status';
         }
       });
@@ -199,45 +165,13 @@ const EditLearningPlan = () => {
     validateForm();
   };
 
-  const addResource = () => {
-    setFormData({
-      ...formData,
-      resources: [...formData.resources, { title: '', url: '', type: 'Video' }],
-    });
-    setTouched((prev) => ({
-      ...prev,
-      [`resourceTitle${formData.resources.length}`]: false,
-      [`resourceUrl${formData.resources.length}`]: false,
-      [`resourceType${formData.resources.length}`]: false,
-    }));
-  };
-
-  const removeResource = (index) => {
-    setFormData({
-      ...formData,
-      resources: formData.resources.filter((_, i) => i !== index),
-    });
-    setErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors[`resourceTitle${index}`];
-      delete newErrors[`resourceUrl${index}`];
-      delete newErrors[`resourceType${index}`];
-      return newErrors;
-    });
-    setTouched((prev) => {
-      const newTouched = { ...prev };
-      delete newTouched[`resourceTitle${index}`];
-      delete newTouched[`resourceUrl${index}`];
-      delete newTouched[`resourceType${index}`];
-      return newTouched;
-    });
-    validateForm();
-  };
+  
+  
 
   const addWeek = () => {
     setFormData({
       ...formData,
-      weeks: [...formData.weeks, { title: '', description: '', status: 'Not Started' }],
+      weeks: [...formData.weeks, { title: '', description: '', status: 'Not Completed' }],
     });
     setTouched((prev) => ({
       ...prev,
@@ -292,7 +226,6 @@ const EditLearningPlan = () => {
         body: JSON.stringify({
           title: formData.title,
           description: formData.description,
-          resources: formData.resources,
           weeks: formData.weeks,
         }),
       });
@@ -397,114 +330,7 @@ const EditLearningPlan = () => {
             )}
           </div>
 
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Learning Resources</h2>
-              <button
-                type="button"
-                onClick={addResource}
-                className="flex items-center px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200 transition-colors duration-200 text-sm font-medium"
-              >
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Add Resource
-              </button>
-            </div>
-            {(touched.resources || hasAttemptedSubmit) && errors.resources && (
-              <p className="mb-3 text-sm text-red-600">{errors.resources}</p>
-            )}
-
-            <div className="space-y-4">
-              {formData.resources.map((resource, index) => (
-                <div key={index} className="p-4 bg-gray-50 border border-gray-100 rounded-lg">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-sm font-medium text-gray-700">Resource {index + 1}</h3>
-                    <button
-                      type="button"
-                      onClick={() => removeResource(index)}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium transition-colors duration-200 flex items-center"
-                      disabled={formData.resources.length === 1}
-                    >
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v8m4-8v8m1-10l-1-1m0 0l-1 1m1-1V3a1 1 0 00-1-1H9a1 1 0 00-1 1v2m11 13h-4.5m-9 0H6"></path>
-                      </svg>
-                      Remove
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                      <input
-                        type="text"
-                        value={resource.title}
-                        onChange={(e) => handleInputChange(e, 'resources', index, 'title')}
-                        onBlur={() => handleBlur('resources', index, 'title')}
-                        className={`block w-full border rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ${
-                          (touched[`resourcesTitle${index}`] || hasAttemptedSubmit) && errors[`resourceTitle${index}`]
-                            ? 'border-red-500'
-                            : 'border-gray-300'
-                        }`}
-                        placeholder="Resource title"
-                        required
-                      />
-                      {(touched[`resourcesTitle${index}`] || hasAttemptedSubmit) && errors[`resourceTitle${index}`] && (
-                        <p className="mt-1 text-sm text-red-600">{errors[`resourceTitle${index}`]}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                      <select
-                        value={resource.type}
-                        onChange={(e) => handleInputChange(e, 'resources', index, 'type')}
-                        onBlur={() => handleBlur('resources', index, 'type')}
-                        className={`block w-full border rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ${
-                          (touched[`resourcesType${index}`] || hasAttemptedSubmit) && errors[`resourceType${index}`]
-                            ? 'border-red-500'
-                            : 'border-gray-300'
-                        }`}
-                        required
-                      >
-                        <option value="" disabled>
-                          Select type
-                        </option>
-                        {resourceTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                      {(touched[`resourcesType${index}`] || hasAttemptedSubmit) && errors[`resourceType${index}`] && (
-                        <p className="mt-1 text-sm text-red-600">{errors[`resourceType${index}`]}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">URL</label>
-                    <input
-                      type="url"
-                      value={resource.url}
-                      onChange={(e) => handleInputChange(e, 'resources', index, 'url')}
-                      onBlur={() => handleBlur('resources', index, 'url')}
-                      className={`block w-full border rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ${
-                        (touched[`resourcesUrl${index}`] || hasAttemptedSubmit) && errors[`resourceUrl${index}`]
-                          ? 'border-red-500'
-                          : 'border-gray-300'
-                      }`}
-                      placeholder="https://example.com"
-                      required
-                    />
-                    {(touched[`resourcesUrl${index}`] || hasAttemptedSubmit) && errors[`resourceUrl${index}`] && (
-                      <p className="mt-1 text-sm text-red-600">{errors[`resourceUrl${index}`]}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+  
 
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
@@ -576,8 +402,8 @@ const EditLearningPlan = () => {
                         }`}
                         required
                       >
-                        <option value="Not Started">Not Started</option>
-                        <option value="In Progress">In Progress</option>
+                        <option value="Not Started">Not Completed</option>
+                        
                         <option value="Completed">Completed</option>
                       </select>
                       {(touched[`weeksStatus${index}`] || hasAttemptedSubmit) && errors[`weekStatus${index}`] && (
