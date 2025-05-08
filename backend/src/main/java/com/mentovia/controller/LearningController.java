@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LearningController {
     
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(LearningController.class);
     private final LearningUpdateRepository learningUpdateRepository;
     private final UserRepository userRepository;

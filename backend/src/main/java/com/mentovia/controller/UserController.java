@@ -397,6 +397,7 @@ public class UserController {
         
         List<UserSearchResultDTO> dtos = following.stream()
             .map(user -> {
+                @SuppressWarnings("unused")
                 boolean isFollowing = currentUser.getFollowing().contains(user.getId());
                 return UserSearchResultDTO.builder()
                     .id(user.getId())

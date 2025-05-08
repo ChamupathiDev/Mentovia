@@ -107,6 +107,7 @@ public class PostController {
     
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable String postId) {
+        @SuppressWarnings("unused")
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         try {
@@ -122,6 +123,7 @@ public class PostController {
     
     @GetMapping("/detail/{postId}")
     public ResponseEntity<Post> getPost(@PathVariable String postId) {
+        @SuppressWarnings("unused")
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         try {
@@ -276,6 +278,7 @@ public class PostController {
         }
         
         post.setLikes(likes);
+        @SuppressWarnings("unused")
         Post updatedPost = postRepository.save(post);
         
         Map<String, Object> response = new HashMap<>();

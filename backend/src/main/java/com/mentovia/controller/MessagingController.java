@@ -20,6 +20,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MessagingController {
     
+    @SuppressWarnings("unused")
     private static final Logger logger = LoggerFactory.getLogger(MessagingController.class);
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;

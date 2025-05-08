@@ -20,6 +20,7 @@ public class LearningPlanController {
 
     private final LearningPlanRepository learningPlanRepository;
     private final UserRepository userRepository;
+     
 
     // Add a new learning plan
     @PostMapping
