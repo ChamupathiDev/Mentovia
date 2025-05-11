@@ -10,42 +10,78 @@ export default function ResourceEdit() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [file, setFile] = useState(null);
+  const [errors, setErrors] = useState({ title: "", desc: "" });
   const { addToast } = useToast();
   const nav = useNavigate();
   const token = localStorage.getItem("token");
 
+  // Validation rules
+  const validateTitle = (value) => {
+    const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
+    if (!value.trim()) return "Title is required.";
+    if (wordCount > 20) return "Title must be below 20 words.";
+    return "";
+  };
+
+  const validateDesc = (value) => {
+    const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
+    if (!value.trim()) return "Description is required.";
+    if (wordCount > 100) return "Description must be below 100 words.";
+    return "";
+  };
+
+  // Fetch existing data
   useEffect(() => {
-    fetch(RESOURCES.LIST + `/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    fetch(`${RESOURCES.LIST}/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(r => r.json())
-      .then(r => {
+      .then((r) => r.json())
+      .then((r) => {
         setData(r);
         setTitle(r.title);
         setDesc(r.description);
       })
       .catch(() => addToast("Cannot load resource", "error"));
-  }, [id]);
+  }, [id, token, addToast]);
+
+  // Validate on change
+  useEffect(() => {
+    setErrors((prev) => ({ ...prev, title: validateTitle(title) }));
+  }, [title]);
+
+  useEffect(() => {
+    setErrors((prev) => ({ ...prev, desc: validateDesc(desc) }));
+  }, [desc]);
 
   const handleSave = () => {
+    // Final validation before submit
+    const titleError = validateTitle(title);
+    const descError = validateDesc(desc);
+    if (titleError || descError) {
+      setErrors({ title: titleError, desc: descError });
+      addToast("Please fix validation errors before saving.", "error");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", desc);
     formData.append("type", data.type);
-    if(file) formData.append("file", file);
+    if (file) formData.append("file", file);
 
     fetch(RESOURCES.UPDATE_UPLOAD(id), {
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
     })
-      .then(r => r.ok ? nav("/admin/resources") : Promise.reject())
+      .then((r) => (r.ok ? nav("/admin/resources") : Promise.reject()))
       .catch(() => addToast("Update failed", "error"));
   };
 
-  if (!data) return <div className="text-center text-gray-400 mt-8">Loading resource details...</div>;
+  const isFormValid = !errors.title && !errors.desc && title.trim() && desc.trim();
+
+  if (!data)
+    return <div className="text-center text-gray-400 mt-8">Loading resource details...</div>;
 
   return (
     <div className="min-h-screen bg-gray-900 p-8 flex flex-col items-center">
@@ -71,36 +107,35 @@ export default function ResourceEdit() {
           {/* Title Input */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              <FiFileText className="inline mr-2 w-4 h-4" />
-              Title
+              <FiFileText className="inline mr-2 w-4 h-4" /> Title
             </label>
             <input
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-400 transition-all"
               placeholder="Enter resource title"
             />
+            {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
           </div>
 
           {/* Description Input */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              <FiAlignLeft className="inline mr-2 w-4 h-4" />
-              Description
+              <FiAlignLeft className="inline mr-2 w-4 h-4" /> Description
             </label>
             <textarea
               value={desc}
-              onChange={e => setDesc(e.target.value)}
+              onChange={(e) => setDesc(e.target.value)}
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-400 h-32 resize-none transition-all"
               placeholder="Add detailed description..."
             />
+            {errors.desc && <p className="mt-1 text-sm text-red-500">{errors.desc}</p>}
           </div>
 
           {/* File Update Section */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              <FiFile className="inline mr-2 w-4 h-4" />
-              Update File
+              <FiFile className="inline mr-2 w-4 h-4" /> Update File
             </label>
             <div className="text-gray-400 text-sm mb-2">
               Current File: {data.mediaLink}
@@ -115,7 +150,7 @@ export default function ResourceEdit() {
                 </div>
                 <input
                   type="file"
-                  onChange={e => setFile(e.target.files[0])}
+                  onChange={(e) => setFile(e.target.files[0])}
                   className="hidden"
                 />
               </label>
@@ -126,10 +161,14 @@ export default function ResourceEdit() {
           <div className="mt-8">
             <button
               onClick={handleSave}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+              disabled={!isFormValid}
+              className={`w-full ${
+                isFormValid
+                  ? "bg-indigo-600 hover:bg-indigo-700"
+                  : "bg-gray-600 cursor-not-allowed"
+              } text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2`}
             >
-              <FiSave className="w-5 h-5" />
-              Update Resource
+              <FiSave className="w-5 h-5" /> Update Resource
             </button>
           </div>
         </div>
@@ -137,4 +176,3 @@ export default function ResourceEdit() {
     </div>
   );
 }
-
