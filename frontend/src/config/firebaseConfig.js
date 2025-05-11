@@ -4,13 +4,13 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // Replace with your actual Firebase project config
 const firebaseConfig = {
-    apiKey: "AIzaSyCJBG6tKmmF9ftWQktJSP_O15zRMeGkA_w",
-    authDomain: "vehicle-service-manageme-4a48d.firebaseapp.com",
-    projectId: "vehicle-service-manageme-4a48d",
-    storageBucket: "vehicle-service-manageme-4a48d.appspot.com",
-    messagingSenderId: "1038146211943",
-    appId: "1:1038146211943:web:98ae1fa96f567f906e44c2",
-    measurementId: "G-HJ0TSKDJ7P"
+  apiKey: "AIzaSyBv464SUYoHlXaHG2wmKJ3G4LKJKg7AY_4",
+  authDomain: "mentovia-c6352.firebaseapp.com",
+  projectId: "mentovia-c6352",
+  storageBucket: "mentovia-c6352.firebasestorage.app",
+  messagingSenderId: "835345475809",
+  appId: "1:835345475809:web:04ef657793d88df89d2fa0",
+  measurementId: "G-KZR2GQT822",
 };
 
 // Initialize Firebase
