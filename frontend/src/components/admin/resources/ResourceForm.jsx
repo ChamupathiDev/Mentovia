@@ -1,20 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { RESOURCES } from "../../../config/apiConfig";
 import { useToast } from "../../common/Toast";
-import { FiSave, FiFileText, FiAlignLeft, FiFile, FiType, FiArrowLeft } from "react-icons/fi";
+import {
+  FiSave,
+  FiFileText,
+  FiAlignLeft,
+  FiFile,
+  FiType,
+  FiArrowLeft,
+} from "react-icons/fi";
 
 export default function ResourceForm() {
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [type, setType] = useState("PDF");
   const [file, setFile] = useState(null);
+  const [errors, setErrors] = useState({ title: "", desc: "" });
   const { addToast } = useToast();
   const nav = useNavigate();
   const token = localStorage.getItem("token");
 
-  const handleSubmit = async e => {
+  // Validation rules
+  const validateTitle = (value) => {
+    const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
+    if (!value.trim()) return "Title is required.";
+    if (wordCount > 20) return "Title must be below 20 words.";
+    return "";
+  };
+
+  const validateDesc = (value) => {
+    const wordCount = value.trim().split(/\s+/).filter(Boolean).length;
+    if (!value.trim()) return "Description is required.";
+    if (wordCount > 100) return "Description must be below 100 words.";
+    return "";
+  };
+
+  // Run validation on change
+  useEffect(() => {
+    setErrors((prev) => ({
+      ...prev,
+      title: validateTitle(title),
+    }));
+  }, [title]);
+
+  useEffect(() => {
+    setErrors((prev) => ({
+      ...prev,
+      desc: validateDesc(desc),
+    }));
+  }, [desc]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Final check before submit
+    const titleError = validateTitle(title);
+    const descError = validateDesc(desc);
+    if (titleError || descError) {
+      setErrors({ title: titleError, desc: descError });
+      addToast("Please fix validation errors before submitting.", "error");
+      return;
+    }
+
     const form = new FormData();
     form.append("title", title);
     form.append("description", desc);
@@ -25,17 +73,19 @@ export default function ResourceForm() {
       const response = await fetch(RESOURCES.UPLOAD, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
-        body: form
+        body: form,
       });
-      
+
       if (!response.ok) throw new Error("Upload failed");
-      
+
       addToast("Resource created successfully!", "success");
       nav("/admin/resources");
     } catch (error) {
       addToast("Failed to create resource", "error");
     }
   };
+
+  const isFormValid = !errors.title && !errors.desc && title && desc && file;
 
   return (
     <div className="min-h-screen bg-gray-900 p-8 flex flex-col items-center">
@@ -51,7 +101,10 @@ export default function ResourceForm() {
       </div>
 
       {/* Form Container */}
-      <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-gray-800 rounded-xl shadow-xl p-8 border border-gray-700">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-2xl bg-gray-800 rounded-xl shadow-xl p-8 border border-gray-700"
+      >
         <h2 className="text-3xl font-bold text-indigo-400 mb-8 flex items-center gap-3">
           <FiFileText className="w-8 h-8" />
           New Learning Resource
@@ -67,10 +120,13 @@ export default function ResourceForm() {
             <input
               required
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-400 transition-all"
               placeholder="Enter resource title"
             />
+            {errors.title && (
+              <p className="mt-1 text-sm text-red-500">{errors.title}</p>
+            )}
           </div>
 
           {/* Description Input */}
@@ -82,10 +138,13 @@ export default function ResourceForm() {
             <textarea
               required
               value={desc}
-              onChange={e => setDesc(e.target.value)}
+              onChange={(e) => setDesc(e.target.value)}
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-400 h-32 resize-none transition-all"
               placeholder="Add detailed description..."
             />
+            {errors.desc && (
+              <p className="mt-1 text-sm text-red-500">{errors.desc}</p>
+            )}
           </div>
 
           {/* Type Select */}
@@ -96,7 +155,7 @@ export default function ResourceForm() {
             </label>
             <select
               value={type}
-              onChange={e => setType(e.target.value)}
+              onChange={(e) => setType(e.target.value)}
               className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none transition-all"
             >
               <option className="bg-gray-800">PDF</option>
@@ -121,7 +180,7 @@ export default function ResourceForm() {
                 <input
                   type="file"
                   required
-                  onChange={e => setFile(e.target.files[0])}
+                  onChange={(e) => setFile(e.target.files[0])}
                   className="hidden"
                 />
               </label>
@@ -132,7 +191,12 @@ export default function ResourceForm() {
           <div className="mt-8">
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+              disabled={!isFormValid}
+              className={`w-full ${
+                isFormValid
+                  ? "bg-indigo-600 hover:bg-indigo-700"
+                  : "bg-gray-600 cursor-not-allowed"
+              } text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center gap-2`}
             >
               <FiSave className="w-5 h-5" />
               Submit Resource
@@ -143,5 +207,3 @@ export default function ResourceForm() {
     </div>
   );
 }
-
-
