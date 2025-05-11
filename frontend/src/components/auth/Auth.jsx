@@ -243,10 +243,7 @@ const Auth = () => {
             >
               Register
             </button>
-            <p className="text-sm my-4">or register with</p>
-            <div className="flex justify-center">
-              {/* You can add more social sign-ups here if desired */}
-            </div>
+           
           </form>
         </div>
 
