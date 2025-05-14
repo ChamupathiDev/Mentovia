@@ -8,7 +8,7 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBv464SUYoHlXaHG2wmKJ3G4LKJKg7AY_4",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "mentovia-c6352.firebaseapp.com",
   projectId: "mentovia-c6352",
   storageBucket: "mentovia-c6352.firebasestorage.app",

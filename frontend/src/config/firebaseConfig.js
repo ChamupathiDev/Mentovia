@@ -4,7 +4,7 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // Replace with your actual Firebase project config
 const firebaseConfig = {
-  apiKey: "AIzaSyBv464SUYoHlXaHG2wmKJ3G4LKJKg7AY_4",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "mentovia-c6352.firebaseapp.com",
   projectId: "mentovia-c6352",
   storageBucket: "mentovia-c6352.firebasestorage.app",
