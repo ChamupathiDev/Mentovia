@@ -1,4 +1,6 @@
-
+#Backend
+backend/src/main/resources/mentovia-c6352-firebase-adminsdk-fbsvc-68406e962d.json
+backend/target/classes/*.json
 # Frontend
 frontend/node_modules/
 frontend/dist/
