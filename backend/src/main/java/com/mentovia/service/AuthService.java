@@ -5,9 +5,13 @@ import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.mentovia.dto.AuthRequest;
 import com.mentovia.dto.RegisterRequest;
 import com.mentovia.model.User;
@@ -79,6 +83,51 @@ public class AuthService {
         } catch (Exception e) {
             throw new RuntimeException("Authentication failed: " + e.getMessage());
         }
+    }
+
+    /**
+     * Accepts a Firebase ID token, verifies it, and returns our own JWT plus user info.
+     */
+    public Map<String, Object> authenticateWithGoogle(String idToken) throws FirebaseAuthException {
+        // 1. Verify Firebase token
+        FirebaseToken decoded = FirebaseAuth.getInstance().verifyIdToken(idToken);
+        String email = decoded.getEmail();
+
+        // 2. Lookup or create local user
+        User user = userRepository.findByEmail(email)
+            .orElseGet(() -> {
+                User u = new User();
+                u.setEmail(email);
+                u.setUsername(email.substring(0, email.indexOf("@")));
+                u.setFirstName((String) decoded.getClaims().getOrDefault("given_name", ""));
+                u.setLastName((String) decoded.getClaims().getOrDefault("family_name", ""));
+                u.setProfilePicture((String) decoded.getClaims().getOrDefault("picture", ""));
+                u.setRole("BEGINNER");
+                // no password for Google‐only
+                u.setEnabled(true);
+                return userRepository.save(u);
+            });
+
+        // 3. Build Spring Security UserDetails
+        UserDetails userDetails = org.springframework.security.core.userdetails.User
+            .withUsername(user.getEmail())
+            .password(user.getPassword() == null ? "" : user.getPassword())
+            .authorities("ROLE_" + user.getRole())
+            .build();
+
+        // 4. Issue our JWT
+        String jwt = jwtService.generateToken(Map.of("authProvider", "google"), userDetails);
+
+        // 5. Return a simple map (or your own DTO)
+        return Map.of(
+            "token", jwt,
+            "user", Map.of(
+                "id", user.getId(),
+                "email", user.getEmail(),
+                "username", user.getUsername(),
+                "role", user.getRole()
+            )
+        );
     }
 }
 

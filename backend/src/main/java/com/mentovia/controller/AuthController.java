@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.firebase.auth.FirebaseAuthException;
 import com.mentovia.dto.AuthRequest;
 import com.mentovia.dto.RegisterRequest;
 import com.mentovia.service.AuthService;
@@ -57,6 +58,24 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleSignIn(@RequestBody Map<String, String> body) {
+        try {
+            String idToken = body.get("idToken");
+            Map<String, Object> tokens = authService.authenticateWithGoogle(idToken);
+            return ResponseEntity.ok(tokens);
+        } catch (FirebaseAuthException e) {
+            logger.error("Firebase token verification failed:", e);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(Map.of("message", "Invalid Google ID token"));
+        } catch (Exception e) {
+            logger.error("Google sign‑in error:", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(Map.of("message", "An error occurred"));
+        }
+    }
+
 }
 
 

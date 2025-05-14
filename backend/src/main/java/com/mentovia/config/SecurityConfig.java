@@ -72,6 +72,8 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 
                 // public auth endpoints
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/users/**").authenticated()
+
 
                 // all other resource reads require authentication
                 .requestMatchers(HttpMethod.GET,    "/resources").authenticated()

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'boxicons/css/boxicons.min.css';
-import { AUTH_ENDPOINTS } from '../../config/apiConfig';
+import { AUTH_ENDPOINTS } from '../../config/apiConfig.js';
 import { useToast } from '../common/Toast';
 import { auth, provider } from '../../config/firebase.js';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
@@ -95,21 +95,34 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      const user = result.user;
-      // Optionally send token or user info to your backend here
-      const idToken = await user.getIdToken();
-      localStorage.setItem('token', idToken);
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const idToken = await result.user.getIdToken();
+
+    const response = await fetch(AUTH_ENDPOINTS.GOOGLE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
       addToast('Google Sign-In successful!', 'success');
+      console.log({ status: response.status, body: data });
+      console.log('storing token:', data.token);
+
       navigate('/profile');
-    } catch (err) {
-      console.error(err);
-      addToast('Google Sign-In failed.', 'error');
+    } else {
+      addToast(data.message || 'Google Sign-In failed.', 'error');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    addToast('Google Sign-In error. Please try again.', 'error');
+  }
+};
+
 
   return (
     <div className={`flex justify-center items-center min-h-screen bg-gradient-to-r ${themeConfig[theme].bg} transition-colors duration-300`}>
