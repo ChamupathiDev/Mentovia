@@ -140,26 +140,26 @@ Notes:
 
 ---
 
-## Backend Configuration (Typical)
+### Backend Configuration (Typical)
 
 Use application.properties or application.yml (depending on your project).
 
 Example application.properties:
 
-# MongoDB
+### MongoDB
 
 spring.data.mongodb.uri=mongodb://localhost:27017/mentovia
 
-# JWT (example — adjust to your implementation)
+### JWT (example — adjust to your implementation)
 
 app.jwt.secret=CHANGE_ME
 app.jwt.expiration=86400000
 
-# CORS (example)
+### CORS (example)
 
 app.cors.allowedOrigins=[http://localhost:5173](http://localhost:5173)
 
-# Upload dir (if used)
+### Upload dir
 
 app.upload.dir=uploads
 
