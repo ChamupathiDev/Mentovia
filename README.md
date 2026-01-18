@@ -1,5 +1,3 @@
-## README.md (paste this entire content)
-
 # Mentovia — Skill Sharing & Learning Platform
 
 Mentovia is a full-stack skill sharing and learning platform with social features and learning progress tracking. It supports **Google Sign-In using Firebase Authentication**, and provides an **admin panel** to manage learning resources (PDF/video).
